@@ -1,0 +1,1 @@
+Note: config.js file (located in root directory) with exports of valid Google Custom Search API Key and CX are required to successfully scrape google.

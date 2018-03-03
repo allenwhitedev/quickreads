@@ -1,0 +1,29 @@
+{
+  "name": "quickreads",
+  "version": "1.0.0",
+  "description": "Get readtimes for google search results",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/allenwhitedev/quickreads.git"
+  },
+  "keywords": [
+    "api",
+    "express",
+    "node"
+  ],
+  "author": "allenwhitedev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/allenwhitedev/quickreads/issues"
+  },
+  "homepage": "https://github.com/allenwhitedev/quickreads#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "request": "^2.83.0"
+  }
+}
