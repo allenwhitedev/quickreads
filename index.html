@@ -8,19 +8,39 @@
 	<body>
 		<h1>Quickreads app</h1>
 
-		<form onsubmit='return testConsoleLog()'>
-			<input type='text' name='searchInput' />
+		<form onsubmit='return searchGoogle()'>
+			<input id='searchInput' type='text' name='searchInput' />
 			<button type='submit'>Test api</button>
 		</form>
 
 	</body>
 
 	<script type="text/javascript">
-		function testConsoleLog()
-		{
-			console.log('testConsoleLog() here')
+		// only one of these can be uncommented at a time
+		const API_URL = 'http://localhost:8001' // development
+		//const API_URL = 'https://quickreads.site' // production
 
-			fetch('http://localhost:8001/test').then( response => response.json() ).then( data => console.log('data:', data) )
+		function searchGoogle(e)
+		{
+			let searchQuery = document.getElementById('searchInput').value 
+			fetch(`${API_URL}/search/${searchQuery}`).then( response => response.json() ).then( data => 
+				{
+					console.log('data:', data)
+					if ( !data ) 
+						return console.log('No data to display')
+
+					let searchResultItems = JSON.parse( data.searchResult )
+					console.log('searchResultItems.length', searchResultItems.length)
+
+					for ( let i in searchResultItems )
+						fetch(`${API_URL}/scrape?link=${searchResultItems[i].link}`).then( response => response.json() ).then( data =>
+							{
+								console.log(`data for ${searchResultItems[i].link}:`, data)
+							} 
+						)
+				} 
+			).catch( error => console.log(`Error using route ${API_URL + '/search/' + searchQuery}: ${error}`) )
+				
 
 			return false // equivalent to e.preventDefault()
 		}
