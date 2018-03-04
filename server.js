@@ -10,6 +10,7 @@ const request = require('request') // used to make http requests to google & web
 const cheerio = require('cheerio') // used to parse web scraped html
 
 app.listen(8001, () => console.log('Quickreads express app listening on port 8001'))
+app.use( express.static('public') ) // serve static assets (images) from public directory
 
 
 app.get('/', (req, res) => res.sendFile(__dirname + '/index.html') )
