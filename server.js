@@ -38,10 +38,9 @@ app.get('/scrape', (req, res) =>
 			console.log('statusCode:', response && response.statusCode)
 
 			let $ = cheerio.load(body)
-			let wordCount = $('body').text().split(' ').length
+			let wordCount = $('body').text().replace(/\s+/g, " ").split(' ').length
 			let imageCount = $('body img').length
 
-			
 			let viewingImagesTime = calculateViewingImagesTime(imageCount) // add time viewing images to read time
 			let readTime = ( wordCount / 275 )  // average reading speed of adult (275 wpm), read time is in minutes
 			readTime += viewingImagesTime / 60

@@ -73,8 +73,8 @@
 										searchResultItem.className = 'searchResultItem'
 										searchResultItem.innerHTML = `			
 											<section class="readTimeSection">
-												<img class='linkFavicon' src='bookIcon.png' />
-												<p class='readTime'> ${ ( data.readTime >= 1000 ) ? ( Math.ceil( data.readTime  ) + ' mins' )  : ( Math.ceil( data.readTime  ) + ' min read' ) } </p>
+												<img class='linkFavicon' src=${ `https://api.statvoo.com/favicon/?url=${searchResultItems[i].link}` ? `https://api.statvoo.com/favicon/?url=${searchResultItems[i].link}` : 'https://quickreads.site/bookIcon.png' } onerror="arguments[0].currentTarget.src='bookIcon.png'" />
+												<p class='readTime'> ${ ( data.readTime >= 100 ) ? ( ( Math.ceil( data.readTime / 60 ) ) + 'hr ' + ( Math.ceil( data.readTime ) % 60 ) + 'min' ) : ( Math.ceil( data.readTime  ) + ' min read' ) } </p>
 											</section>
 
 											<section class="searchResultTextSection">	
@@ -139,7 +139,8 @@
 			display: flex; align-items: center; flex-direction: row; text-decoration: none;
 		}
 		.searchResultItemSnippet { margin: 2px 0px; }
-		.searchResultItemTitle { text-decoration: underline; margin: 2px 0px;}
+		a { text-decoration: none; }
+		.searchResultItemTitle { margin: 2px 0px;}
 		.searchResultItem > * { margin: 5px; }
 		.linkFavicon { height: 40px; width: 40px; }
 		.readTimeSection 
@@ -148,6 +149,17 @@
 			margin-right: 20px; height: 250px: width: 250px; white-space: nowrap; 
 		}
 		.readTime { text-decoration: none; margin: 5px 0px 0px 0px; color: #616161;  }
+
+		@media screen and (max-width: 600px)
+		{
+			.mobileHidden { display: none; }
+			body { background-color: pink !important; }
+			.searchResultItemTitle { font-size: 1rem; }
+			.linkFavicon { height: 30px; width: 30px; }
+			.readTime { font-size: .75rem; } 
+			.searchResultItemsContainer, .searchResultItem { width: 90%; }
+
+		}
 
 	</style>
 
