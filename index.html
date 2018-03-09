@@ -16,8 +16,8 @@
 
 			<section class="searchSection">
 				
-				<button class="microphoneButton">
-					<i class="material-icons microphoneIcon">mic</i>
+				<button type='button' onclick='console.log("searchByVoice button click triggered");return searchByVoice()' class="microphoneButton">
+					<i class="material-icons microphoneIcon" id='microphoneIcon'>mic</i>
 				</button>
 
 				<!-- whitespace between <input /> and <button> will render so so html comment is used to negate whitespace -->
@@ -69,30 +69,67 @@
 					for ( let i in searchResultItems )
 						fetch(`${API_URL}/scrape?link=${searchResultItems[i].link}`).then( response => response.json() ).then( data =>
 							{
-										let searchResultItem = document.createElement('li')
-										searchResultItem.className = 'searchResultItem'
-										searchResultItem.innerHTML = `			
-											<section class="readTimeSection">
-												<img class='linkFavicon' src=${ `https://api.statvoo.com/favicon/?url=${searchResultItems[i].link}` ? `https://api.statvoo.com/favicon/?url=${searchResultItems[i].link}` : 'https://quickreads.site/bookIcon.png' } onerror="arguments[0].currentTarget.src='bookIcon.png'" />
-												<p class='readTime'> ${ ( data.readTime >= 100 ) ? ( ( Math.ceil( data.readTime / 60 ) ) + 'hr ' + ( Math.ceil( data.readTime ) % 60 ) + 'min' ) : ( Math.ceil( data.readTime  ) + ' min read' ) } </p>
-											</section>
+								let searchResultItem = document.createElement('li')
+								searchResultItem.className = 'searchResultItem'
+								searchResultItem.innerHTML = `			
+									<section class="readTimeSection">
+										<img class='linkFavicon' src=${ `https://api.statvoo.com/favicon/?url=${searchResultItems[i].link}` ? `https://api.statvoo.com/favicon/?url=${searchResultItems[i].link}` : 'https://quickreads.site/bookIcon.png' } onerror="arguments[0].currentTarget.src='bookIcon.png'" />
+										<p class='readTime'> ${ ( data.readTime >= 100 ) ? ( ( Math.ceil( data.readTime / 60 ) ) + 'hr ' + ( Math.ceil( data.readTime ) % 60 ) + 'min' ) : ( Math.ceil( data.readTime  ) + ' min read' ) } </p>
+									</section>
 
-											<section class="searchResultTextSection">	
-												<a href='${searchResultItems[i].link}'>
-													<h3 class='searchResultItemTitle'> ${ searchResultItems[i].title } </h3>
-												</a>
-												<p class="mobileHidden searchResultItemSnippet" id='searchResultItemSnippet0'>
-													${ searchResultItems[i].snippet }
-												</p>
-											</section>`
+									<section class="searchResultTextSection">	
+										<a href='${searchResultItems[i].link}'>
+											<h3 class='searchResultItemTitle'> ${ searchResultItems[i].title } </h3>
+										</a>
+										<p class="mobileHidden searchResultItemSnippet" id='searchResultItemSnippet0'>
+											${ searchResultItems[i].snippet }
+										</p>
+									</section>`
 
-											document.getElementById('searchResults').append(searchResultItem)
-								console.log(`data for ${searchResultItems[i].link}:`, data)
+									document.getElementById('searchResults').append(searchResultItem)
 							} 
 						)
 				} 
 			).catch( error => console.log(`Error using route ${API_URL + '/search/' + searchQuery}: ${error}`) )
 				
+			return false // equivalent to e.preventDefault()
+		}
+
+		let transcript = ''
+		let recognition = new webkitSpeechRecognition()
+		recognition.onstart = () => console.log('start speech recognition')
+		
+		// search google with transcript from voice recognition
+		recognition.onresult = (e) => 
+		{
+			console.log('onresult from recognition, e:', e)
+
+			for ( let i = e.resultIndex; i < e.results.length; i++ )
+				transcript += e.results[i][0].transcript
+
+			document.getElementById('searchInput').value  = transcript
+			searchGoogle() // may have to use callback to make sure searchInput value is set to transcript 
+		}
+
+		// remove active mic styles after captruing mic input
+		recognition.onend = () => 
+			{ let mic = document.getElementById('microphoneIcon'); mic.classList.remove('pulse'); mic.style.color = '#424242' }
+
+		function searchByVoice()
+		{
+			transcript = '' // reset transcript
+			document.getElementById('searchInput').value = '' // reset search input when using mic
+			document.getElementById('microphoneIcon').style.color = 'red' // add active styles to microphone icon
+			document.getElementById('microphoneIcon').classList.add('pulse')
+
+			if ( !('webkitSpeechRecognition' in window) )
+				alert('Speech Recognition not supported by browser.')
+			else
+			{
+				recognition.lang = 'en-US'
+				recognition.start()
+			}
+
 			return false // equivalent to e.preventDefault()
 		}
 	</script>
@@ -149,6 +186,43 @@
 			margin-right: 20px; height: 250px: width: 250px; white-space: nowrap; 
 		}
 		.readTime { text-decoration: none; margin: 5px 0px 0px 0px; color: #616161;  }
+
+		.pulse {
+		  border-radius: 50%;
+		  background: #cca92c;
+		  cursor: pointer;
+		  box-shadow: 0 0 0 rgba(204,169,44, 0.4);
+		  animation: pulse 2s infinite;
+		}
+		.pulse:hover {
+		  animation: none;
+		}
+
+		@-webkit-keyframes pulse {
+		  0% {
+		    -webkit-box-shadow: 0 0 0 0 rgba(204,169,44, 0.4);
+		  }
+		  70% {
+		      -webkit-box-shadow: 0 0 0 10px rgba(204,169,44, 0);
+		  }
+		  100% {
+		      -webkit-box-shadow: 0 0 0 0 rgba(204,169,44, 0);
+		  }
+		}
+		@keyframes pulse {
+		  0% {
+		    -moz-box-shadow: 0 0 0 0 rgba(204,169,44, 0.4);
+		    box-shadow: 0 0 0 0 rgba(204,169,44, 0.4);
+		  }
+		  70% {
+		      -moz-box-shadow: 0 0 0 10px rgba(204,169,44, 0);
+		      box-shadow: 0 0 0 10px rgba(204,169,44, 0);
+		  }
+		  100% {
+		      -moz-box-shadow: 0 0 0 0 rgba(204,169,44, 0);
+		      box-shadow: 0 0 0 0 rgba(204,169,44, 0);
+		  }
+		}
 
 		@media screen and (max-width: 600px)
 		{

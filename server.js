@@ -23,7 +23,8 @@ app.get('/search/:searchQuery', (req, res) =>
 	request(`https://www.googleapis.com/customsearch/v1?key=${GOOGLE_CUSTOM_SEARCH_API_KEY}&cx=${GOOGLE_CX}&q=${searchQuery}`, 
 		(error, response, body) => 
 		{
-			console.log('statusCode:', response && response.statusCode)
+			if ( !response || response.statusCode !== 200 )
+				console.log('statusCode from /search:', response && response.statusCode)
 			
 			let googleSearchResults = JSON.parse(body).items
 			res.send({ error, searchResult: JSON.stringify(googleSearchResults) })
@@ -35,7 +36,10 @@ app.get('/scrape', (req, res) =>
 {
 	request(req.query.link, (error, response, body) =>
 		{
-			console.log('statusCode:', response && response.statusCode)
+			if ( !response || response.statusCode !== 200 )
+				console.log('statusCode from /scrape:', response && response.statusCode)
+
+			if ( !body ) return res.send({error: `Error: Html body was undefined for '${req.query.link}'`})
 
 			let $ = cheerio.load(body)
 			let wordCount = $('body').text().replace(/\s+/g, " ").split(' ').length
